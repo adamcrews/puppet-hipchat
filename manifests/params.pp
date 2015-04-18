@@ -11,9 +11,22 @@ class puppet_hipchat::params {
 
   if str2bool($::is_pe) {
     $puppetconf_path = '/etc/puppetlabs/puppet'
-    $provider        = 'pe_gem'
     $owner           = 'pe-puppet'
     $group           = 'pe-puppet'
+    
+    case $::puppetversion {
+      /Puppet Enterprise 3.[0-6]/: {
+        $provider = 'pe_gem'
+      }
+
+      /Puppet Enterprise [1-2]/: {
+        fail("Wow, that's an old PE. Sorry, not it's supported")
+      }
+
+      default: {
+        $provider = 'pe_puppetserver_gem'
+      }
+    }
   } else {
     $puppetconf_path = '/etc/puppet'
     $provider        = 'gem'
